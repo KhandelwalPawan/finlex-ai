@@ -1,0 +1,6 @@
+data/
+rag-venv/
+vectorstore/
+__pycache__/
+*.pyc
+.env
