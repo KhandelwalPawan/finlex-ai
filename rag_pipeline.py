@@ -3,7 +3,7 @@ from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 
 #loading Faiss
@@ -22,7 +22,7 @@ def get_rag_chain():
 
 # instantiating LLM
 
-    llm = ChatOllama(model= 'llama3.2', temperature= 0)
+    llm = ChatOllama(model= 'llama3.2', temperature= 0.2)
 
 
     message = """ You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the 
@@ -31,15 +31,16 @@ def get_rag_chain():
 
     prompt = ChatPromptTemplate.from_template(message)
 
-    rag_chain = ({'context': retriever, 'question': RunnablePassthrough()}
-                 | prompt
-                 | llm
-                 | StrOutputParser()
-                 ) 
+    retrieval = RunnableParallel(
+        context = retriever,  # path 1: documents for the prompt
+        question = RunnablePassthrough()  # path 2: original question passes through
+    )
+
+    rag_chain = retrieval | RunnableParallel(
+        answer = prompt | llm | StrOutputParser(),
+        sources = lambda x: list(set([doc.metadata['source'] for doc in x['context']]))
+    )
     
     return rag_chain
 
 
-
-# result = rag_chain.invoke("What is the role of SEBI in regulating securities markets?")
-# print(result)
