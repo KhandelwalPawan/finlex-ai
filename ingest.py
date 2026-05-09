@@ -34,14 +34,12 @@ for file in doc_list:
 
 # embedding documnents
 
-# model_name = "all-MiniLM-L6-v2" 
-# embedding_function = HuggingFaceEmbeddings(model_name = model_name)
+model_name = "all-MiniLM-L6-v2" 
+embedding_function = HuggingFaceEmbeddings(model_name = model_name)
 
-# vectorstore = FAISS.from_documents(
-#     chunk_list,
-#     embedding= embedding_function
-# )
+vectorstore = FAISS.from_documents(
+    chunk_list,
+    embedding= embedding_function
+)
 
-# vectorstore.save_local('vectorstore')
-
-print(chunk_list[0].metadata)
+vectorstore.save_local('vectorstore')
