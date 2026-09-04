@@ -1,7 +1,6 @@
-data/
-rag-venv/
-vectorstore/
+.env
+.git
 __pycache__/
 *.pyc
-.env
+rag-venv/
 eval_results.json
