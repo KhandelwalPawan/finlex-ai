@@ -98,6 +98,32 @@ class ApiHealthTest(unittest.TestCase):
         self.assertEqual(response.status_code, 504)
         api_module._chain = None
 
+    def test_rate_limit_returns_429(self):
+        import time
+        from starlette.testclient import TestClient
+        import api as api_module
+        # Simulate reaching rate limit for testclient IP
+        api_module._rate_buckets["testclient"] = [time.monotonic()] * api_module._RATE_LIMIT_MAX
+        client = TestClient(api_module.app)
+        response = client.get("/sources")
+        self.assertEqual(response.status_code, 429)
+        self.assertIn("Rate limit", response.json()["error"])
+        # Clean up
+        api_module._rate_buckets.clear()
+
+    def test_chat_stream_success(self):
+        from starlette.testclient import TestClient
+        import api as api_module
+        api_module._chain = MagicMock()
+        api_module._chain.invoke_streaming.return_value = ["Hello", " world"]
+        client = TestClient(api_module.app)
+        response = client.post("/chat/stream", json={"question": "Test stream"})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/event-stream", response.headers["content-type"])
+        self.assertIn("[DONE]", response.text)
+        self.assertIn("Hello", response.text)
+        api_module._chain = None
+
 
 if __name__ == "__main__":
     unittest.main()

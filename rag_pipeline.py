@@ -52,7 +52,7 @@ class Citation:
     excerpt: str
 
 
-def _clean_text(value: str, max_length: int = 650) -> str:
+def _clean_text(value: str, max_length: int = 1200) -> str:
     text = re.sub(r"\s+", " ", value).strip()
     if len(text) <= max_length:
         return text
@@ -129,6 +129,29 @@ class ConversationMemory:
 
 
 class ProductionRAGChain:
+    _config: AppConfig | None = None
+    _memory: ConversationMemory | None = None
+
+    @property
+    def config(self) -> AppConfig:
+        if self._config is None:
+            self._config = get_config()
+        return self._config
+
+    @config.setter
+    def config(self, value: AppConfig) -> None:
+        self._config = value
+
+    @property
+    def memory(self) -> ConversationMemory:
+        if self._memory is None:
+            self._memory = ConversationMemory(max_turns=MAX_HISTORY_TURNS)
+        return self._memory
+
+    @memory.setter
+    def memory(self, value: ConversationMemory) -> None:
+        self._memory = value
+
     def __init__(self, config: AppConfig | None = None) -> None:
         self.config = config or get_config()
         validate_vectorstore(

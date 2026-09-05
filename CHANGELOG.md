@@ -21,9 +21,12 @@ All notable changes to **FinLex AI** are documented here.
 - **Confidence color badges**: high=green, medium=amber, low=red, none=grey via inline CSS.
 - **Streamlit dark theme** with green primary color and `maxUploadSize = 200 MB`.
 - **`docker-compose.yml`**: `finlex-ui` (Streamlit:8501) and `finlex-api` (uvicorn:8000) with bind-mounted volumes, env_file, health checks, and restart policies.
-- **`tests/test_api.py`**: 8 unit tests covering all API endpoints with mocked chain and healthcheck.
+- **`tests/test_api.py`**: 10 unit tests covering all API endpoints with mocked chain, healthcheck, rate limits (429), and streaming SSE.
 - **`tests/test_healthcheck.py`**: 5 unit tests for `run_healthcheck()` edge cases.
 - **`tests/test_ingest.py`**: 5 unit tests for `_pdf_files()` and `_load_and_split()` with mocked loader.
+- **`tests/test_rag_pipeline.py`**: 11 unit tests covering memory, streaming guards, length limit, and security guardrails.
+- **`generate_docs.py`**: PDF generator using PyMuPDF for regulatory compendia (DPDP 2023, IBC 2016, FEMA 1999).
+- **`test_query_runner.py`**: Automated end-to-end live test runner executing questions across documents and guardrails.
 - **Expanded `eval_questions.json`**: 10 questions covering inventory, live-data refusal, prompt injection, empty input, domain-grounded (ICA, income-tax, SEBI, RBI), out-of-scope, and cross-document synthesis.
 
 ### Changed
